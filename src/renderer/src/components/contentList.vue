@@ -24,15 +24,46 @@
 
 
 <script setup lang="ts">
-import { defineProps } from 'vue';
+import { defineProps,reactive, watch} from 'vue';
 import draggable from "vuedraggable";
 import { Delete, Plus, Expand} from '@element-plus/icons-vue'
 interface Props{
     fileContent: Record<string, any>
+    keyMap:Record<string, Object>
 }
 
-defineProps<Props>();
+// 接收 props
+const props = defineProps<Props>();
 
+
+// 定义更新事件
+const emit = defineEmits(['update:fileContent']);
+
+// 创建本地响应式副本
+const localFileContent = reactive({ ...props.fileContent });
+
+// 监听本地数据变化并同步更新父组件
+watch(
+  () => localFileContent,
+  (newValue) => {
+    emit('update:fileContent', newValue);
+  },
+  { deep: true }
+);
+
+// 删除数组元素
+const removeInput = (key: string, index: number) => {
+  if (Array.isArray(localFileContent[key])) {
+    localFileContent[key].splice(index, 1);
+  }
+};
+
+// 添加数组元素
+const addInput = (key: string) => {
+  if (Array.isArray(localFileContent[key])) {
+    localFileContent[key].push("");
+  }
+};
 </script>
 
 
