@@ -8,7 +8,10 @@
   <label>
     <strong style="font-weight: bold;">{{ keyMapRef[key]['meta'] || key }}:</strong>
   </label>
-  <el-button @click="addInput(key)" type="primary" plain  style="width: 40px;" :icon="Plus"></el-button>
+  <div>
+    <el-button @click="addInput(key)" type="primary" plain  style="width: 40px;" :icon="Plus"></el-button>
+    <el-button @click="selectFolder(key)" type="primary" plain  style="width: 40px;" :icon="FolderOpened"></el-button>
+  </div>
   <draggable item-key="$$key" ghost-class="ghost" :list="value" class="list-group" handle=".handle">
     <template #item="{ index }">
       <div class="list-group-item array-input">
@@ -50,9 +53,10 @@
 </template>
 
 <script setup lang="ts">
-import { toRef } from 'vue';
+import { toRef ,nextTick} from 'vue';
 import draggable from "vuedraggable";
-import { Delete, Plus, Expand } from '@element-plus/icons-vue'
+import { Delete, Plus, Expand ,FolderOpened} from '@element-plus/icons-vue'
+import { JsonFileResult } from '@renderer/global';
 interface Props {
   fileContent: Record<string, any>
   keyMap: any
@@ -103,6 +107,21 @@ function newObj(original: object) {
     return acc;
   }, {});
 }
+
+
+
+//选择指定文件夹内的内容
+const selectFolder = async (key: string) => {
+      try {
+        const result:JsonFileResult = await window.api.selectFolder();       
+        if(result.filesName.length != 0){
+          fileContentRef.value[key] = [...result.filesName];
+          await nextTick(); // 确保更新 DOM
+        }
+      } catch (error) {
+        console.error('Error selecting folder:', error);
+      }
+    };
 </script>
 
 <style scoped>

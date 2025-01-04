@@ -5,7 +5,8 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   readJson: () => ipcRenderer.invoke('read-json-file'),
   writeJson:(updatedData) => ipcRenderer.invoke('write-json',updatedData),
-  readJsonByPath:(filebyPath:string) => ipcRenderer.invoke('read-json-by-path',filebyPath)
+  readJsonByPath:(filebyPath:string) => ipcRenderer.invoke('read-json-by-path',filebyPath),
+  selectFolder:() => ipcRenderer.invoke('select-folder')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

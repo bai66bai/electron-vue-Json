@@ -1,10 +1,12 @@
-import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog  } from 'electron'
 import { readFileSync } from 'fs'
 import path, { join } from 'path'
 import fs from 'fs'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.ico?asset'
 import { processJsonString } from "../utils/jsonUtil";
+
+
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -168,6 +170,28 @@ app.whenReady().then(() => {
       console.error('更新 JSON 文件时出错:', error);
       return { success: false, message: '更新 JSON 文件失败', error };
     }
+  });
+
+  //选择文件夹并读取文件夹下的内容
+  ipcMain.handle('select-folder', async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openDirectory','openFile'],
+      filters: [
+        { name: '所有文件', extensions: ['*'] }, // 显示所有文件类型
+      ],
+    });
+    
+    if (result.canceled) {
+      return []; // 用户取消选择
+    }
+
+    const folderPath = result.filePaths[0];
+    const filesName = fs.readdirSync(folderPath).filter((file) => {
+      const fullPath = path.join(folderPath, file);
+      return fs.statSync(fullPath).isFile(); // 仅返回文件
+    });
+
+    return {filesName}; // 返回文件名数组（包含扩展名）
   });
 
   createWindow()

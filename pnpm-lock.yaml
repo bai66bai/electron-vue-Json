@@ -10,10 +10,10 @@ importers:
     dependencies:
       '@electron-toolkit/preload':
         specifier: ^3.0.0
-        version: 3.0.1(electron@31.7.6)
+        version: 3.0.1(electron@33.2.1)
       '@electron-toolkit/utils':
         specifier: ^3.0.0
-        version: 3.0.0(electron@31.7.6)
+        version: 3.0.0(electron@33.2.1)
       element-plus:
         specifier: ^2.9.1
         version: 2.9.1(vue@3.5.13(typescript@5.7.2))
@@ -52,8 +52,8 @@ importers:
         specifier: ^13.0.0
         version: 13.0.0(eslint-plugin-vue@9.32.0(eslint@8.57.1))(eslint@8.57.1)(typescript@5.7.2)
       electron:
-        specifier: ^31.7.6
-        version: 31.7.6
+        specifier: ^33.2.1
+        version: 33.2.1
       electron-builder:
         specifier: 25.1.8
         version: 25.1.8(electron-builder-squirrel-windows@24.13.3(dmg-builder@25.1.8))
@@ -1263,8 +1263,8 @@ packages:
       '@swc/core':
         optional: true
 
-  electron@31.7.6:
-    resolution: {integrity: sha512-fc2kMaEc/zxGTW6oCxbuE7BQNOlDucSo+351AiovBAcp7G0iQkVu3k2kHIQolSsD38+tPdBj/N02DVpZTzi7rg==}
+  electron@33.2.1:
+    resolution: {integrity: sha512-SG/nmSsK9Qg1p6wAW+ZfqU+AV8cmXMTIklUL18NnOKfZLlum4ZsDoVdmmmlL39ZmeCaq27dr7CgslRPahfoVJg==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
 
@@ -2669,17 +2669,17 @@ snapshots:
     dependencies:
       eslint: 8.57.1
 
-  '@electron-toolkit/preload@3.0.1(electron@31.7.6)':
+  '@electron-toolkit/preload@3.0.1(electron@33.2.1)':
     dependencies:
-      electron: 31.7.6
+      electron: 33.2.1
 
   '@electron-toolkit/tsconfig@1.0.1(@types/node@20.17.10)':
     dependencies:
       '@types/node': 20.17.10
 
-  '@electron-toolkit/utils@3.0.0(electron@31.7.6)':
+  '@electron-toolkit/utils@3.0.0(electron@33.2.1)':
     dependencies:
-      electron: 31.7.6
+      electron: 33.2.1
 
   '@electron/asar@3.2.17':
     dependencies:
@@ -3056,7 +3056,7 @@ snapshots:
 
   '@types/electron@1.6.12':
     dependencies:
-      electron: 31.7.6
+      electron: 33.2.1
     transitivePeerDependencies:
       - supports-color
 
@@ -3928,7 +3928,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron@31.7.6:
+  electron@33.2.1:
     dependencies:
       '@electron/get': 2.0.3
       '@types/node': 20.17.10
