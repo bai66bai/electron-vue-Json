@@ -1,17 +1,16 @@
 <template>
   <el-card shadow="hover" class="card">
     <div class="card-header">
-      <h1>配置面板</h1>
+      <h2>配置面板</h2>
     </div>
     <el-divider style="margin: 15px 0;" />
+    <el-button @click="readJsonFile" type="primary" plain style="margin-bottom: 2px;margin-left: 10px;"><el-icon><FolderOpened /></el-icon>选择文件</el-button>
     <el-scrollbar class="scrollable-content">
-      <el-button @click="readJsonFile" type="primary" plain style="margin-bottom: 5px;"><el-icon><FolderOpened /></el-icon>选择文件</el-button>
+      
       <contentList v-if="fileContent != undefined" :fileContent="fileContent" :keyMap="keyMap"/>
     </el-scrollbar>
     <el-button @click="saveJsonFile" style="margin-top: 14px; float: right; margin-right: 60px;" type="primary"
       plain>保存</el-button>
-    <!-- <el-button @click="clearlocalStorage" style="margin-top: 14px; float: right; margin-right: 60px;" type="primary"
-      plain>清除本地缓存</el-button> -->
   </el-card>
 </template>
 
@@ -29,7 +28,6 @@ onMounted(() => {
     readJsonByPa(window.localStorage.getItem("filePath") as string)
   }
 })
-
 
 // 定义响应式数据
 const fileContent: Ref<Record<string,any>|undefined> = ref()
@@ -64,6 +62,7 @@ const readJsonByPa = async (path: string) => {
     const result: JsonFileResult = await window.api.readJsonByPath(path)
     //映射文件
     keyMap.value = result.metaContent
+    console.log(result.content);
     
     // 显示读取结果    
     fileContent.value = result.content
@@ -75,9 +74,9 @@ const readJsonByPa = async (path: string) => {
 // 保存到 JSON 文件
 const saveJsonFile = async () => {
   try {
-    console.log(fileContent.value);
     
     const dataToSave = JSON.parse(JSON.stringify(fileContent.value));
+    
     await window.api.writeJson(dataToSave);
     ElMessage.success("文件保存成功")
   } catch (error) {
@@ -100,9 +99,9 @@ const saveJsonFile = async () => {
 }
 
 .scrollable-content {
-  width: 90%;
-  margin: 0 auto;
-  max-height: 470px;
+  width: calc(100% -10px);
+  margin: 10px;
+  max-height: calc(100vh - 210px);
   /* 设置最大高度 */
   overflow: auto;
   /* 当内容超过高度时出现滚动条 */

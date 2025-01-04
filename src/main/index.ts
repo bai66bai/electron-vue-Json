@@ -41,12 +41,12 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-//指定空的Meta对象
-    let metaContent = {};
-// 指定路径，读取 `Source.Json` 文件
-    const folderPath = ''
-// 直接读取指定路径的 JSON 文件
-    let filePath = ''
+  //指定空的Meta对象
+  let metaContent = {};
+  // 指定路径，读取 `Source.Json` 文件
+  const folderPath = ''
+  // 直接读取指定路径的 JSON 文件
+  let filePath = ''
   // 读取json文件
   ipcMain.handle('read-json-file', async () => {
     try {
@@ -62,33 +62,75 @@ app.whenReady().then(() => {
 
       filePath = files[0]
       const fileContent = readFileSync(filePath, 'utf-8')
-      const content = JSON.parse(fileContent)
+      const content = processJsonString(fileContent)
       //先读meta.json
-      readMetaFile(filePath,content)
-      return {filePath , content , metaContent}
+      readMetaFile(filePath, content)
+      return { filePath, content, metaContent }
     } catch (error) {
-      return { error} 
+      return { error }
     }
   })
 
   //读取meta.json的方法
-  const readMetaFile = (filePath,content) =>{
-     //先读meta.json
-     const fullPath = path.resolve(path.dirname(filePath),'meta.json')
-     if(fs.existsSync(fullPath)){
-        metaContent = {}
-        metaContent = JSON.parse(readFileSync(fullPath, 'utf-8'))
-     }else{
-       //遍历获取到的对象的键值并做成对象
-          metaContent = {}
-         Object.keys(content).forEach(key =>{
-           metaContent[key] = key
-         })
-         //用存储好的数据创建meta.json
-         fs.writeFileSync(fullPath, JSON.stringify(metaContent, null, 2), 'utf-8');
-     }
+  const readMetaFile = (filePath, content) => {
+    //先读meta.json
+    const fullPath = path.resolve(path.dirname(filePath), 'meta.json')
+    if (fs.existsSync(fullPath)) {
+      metaContent = {}
+      metaContent = JSON.parse(readFileSync(fullPath, 'utf-8'), (key, value) => {
+        if (key === "_type") {          
+          return undefined;
+        }
+        return value; // 其他键正常返回值
+      })
+    } else {
+      //遍历获取到的对象的键值并做成对象
+      metaContent = makeMeta(content)
+      //用存储好的数据创建meta.json
+      fs.writeFileSync(fullPath, JSON.stringify(metaContent, null, 2), 'utf-8');
+    }
   }
 
+  //解析json对象数组的方法
+  const makeMeta = (content: Record<string, any>) => {
+    let currentMetaContent: Record<string, any> = {}
+    for (const key in content) {
+      if (content.hasOwnProperty(key)) {
+        const value = content[key];
+
+        // 判断类型并分别处理
+        if (Array.isArray(value)) {
+          let arrContent: Record<string, string> = {
+            meta: key,
+            _type: "array"
+          }
+          if (value.every(item => typeof item == 'object' || item === null)) {
+            //如果是对象数组，创建一个新的对象
+            value.forEach(item => {
+              if (typeof item === 'object' && item !== null) {
+                Object.keys(item).forEach(nestedKey => {
+                  arrContent[nestedKey] = nestedKey
+                })
+              }
+            })
+          }
+          currentMetaContent[key] = arrContent
+        } else if (typeof value === 'object' && value !== null) {
+          //递归处理对象
+          const recursiveObjContent = makeMeta(value)
+          let objContent: Record<string, string> = {
+            meta: key,
+            _type: "object",
+            ...recursiveObjContent
+          }
+          currentMetaContent[key] = objContent 
+        } else {
+          currentMetaContent[key] = key; //普通值，键名直接存储
+        }
+      }
+    }
+    return currentMetaContent;
+  }
 
   //读取指定路径的json文件
   ipcMain.handle('read-json-by-path', async (_event, filebyPath) => {
@@ -98,30 +140,33 @@ app.whenReady().then(() => {
       }
       filePath = filebyPath
       const fileContent = readFileSync(filebyPath, 'utf-8')
-      
+
       const content = processJsonString(fileContent)
       //先读meta.json
-      readMetaFile(filePath,content)
-      return {content , filePath , metaContent}
+      readMetaFile(filePath, content)
+      return { content, filePath, metaContent }
     } catch (error) {
-      return { error}
+      return { error }
     }
   })
 
-
-
   //保存json文件
-  ipcMain.handle('write-json', async (_event,updatedData) => {
+  ipcMain.handle('write-json', async (_event, updatedData) => {
     try {
       // 将数据写入文件
-      //console.log(JSON.stringify(updatedData, null, 2), 'utf-8');
-      
-      fs.writeFileSync(filePath, JSON.stringify(updatedData, null, 2), 'utf-8');
+
+      fs.writeFileSync(filePath, JSON.stringify(updatedData, (key, value) => {
+        // 如果是指定的键，返回 undefined（表示忽略此键）
+        if (key === "$$key") {
+          return undefined;
+        }
+        return value; // 其他键正常返回值
+      }, 2), 'utf-8');
       console.log('JSON 文件已更新');
       return { success: true, message: 'JSON 文件更新成功' };
     } catch (error) {
       console.error('更新 JSON 文件时出错:', error);
-      return { success: false, message: '更新 JSON 文件失败', error }; 
+      return { success: false, message: '更新 JSON 文件失败', error };
     }
   });
 
