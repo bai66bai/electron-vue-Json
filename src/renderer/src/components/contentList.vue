@@ -9,8 +9,8 @@
     <strong style="font-weight: bold;">{{ keyMapRef[key]['meta'] || key }}:</strong>
   </label>
   <div>
-    <el-button @click="addInput(key)" type="primary" plain  style="width: 40px;" :icon="Plus"></el-button>
-    <el-button @click="selectFolder(key)" type="primary" plain  style="width: 40px;" :icon="FolderOpened"></el-button>
+    <!-- <el-button @click="addInput(key)" type="primary" plain  style="width: 40px;" :icon="Plus"></el-button> -->
+    <el-button @click="selectFolder(key)" v-if="typeof value[0] === 'string' || value.length == 0 "  type="primary" plain  style="width: 40px;" :icon="FolderOpened"></el-button>
   </div>
   <draggable item-key="$$key" ghost-class="ghost" :list="value" class="list-group" handle=".handle">
     <template #item="{ index }">
@@ -113,10 +113,12 @@ function newObj(original: object) {
 //选择指定文件夹内的内容
 const selectFolder = async (key: string) => {
       try {
-        const result:JsonFileResult = await window.api.selectFolder();       
+        const result:JsonFileResult = await window.api.selectFiles();             
         if(result.filesName.length != 0){
           fileContentRef.value[key] = [...result.filesName];
           await nextTick(); // 确保更新 DOM
+        }else{
+
         }
       } catch (error) {
         console.error('Error selecting folder:', error);

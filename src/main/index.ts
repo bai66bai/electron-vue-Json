@@ -173,23 +173,22 @@ app.whenReady().then(() => {
   });
 
   //选择文件夹并读取文件夹下的内容
-  ipcMain.handle('select-folder', async () => {
+  ipcMain.handle('select-files', async () => {
     const result = await dialog.showOpenDialog({
-      properties: ['openDirectory','openFile'],
+      properties: ['openFile', 'multiSelections'], // 允许多选
       filters: [
-        { name: '所有文件', extensions: ['*'] }, // 显示所有文件类型
+        { name: 'Media', extensions: ['png', 'jpg', 'jpeg', 'bmp', 'tga', 'gif', 'psd', 'tiff', 'exr', 'mp4', 'mov', 'avi', 'webm', 'mkv', 'ogv'] }, // 根据需要调整格式
       ],
     });
     
+    let filesName;
+
     if (result.canceled) {
-      return []; // 用户取消选择
+      filesName = []
+      return {filesName}; // 用户取消选择
     }
 
-    const folderPath = result.filePaths[0];
-    const filesName = fs.readdirSync(folderPath).filter((file) => {
-      const fullPath = path.join(folderPath, file);
-      return fs.statSync(fullPath).isFile(); // 仅返回文件
-    });
+   filesName = result.filePaths.map(filePath => path.basename(filePath));
 
     return {filesName}; // 返回文件名数组（包含扩展名）
   });

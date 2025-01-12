@@ -8,7 +8,7 @@ declare global {
       readJson: () => Promise<JsonFileResult>,
       writeJson:(updatedData) => Promise<JsonFileResult>,
       readJsonByPath:(filebyPath:string) => Promise<JsonFileResult>,
-      selectFolder:() =>Promise<JsonFileResult>
+      selectFiles:() =>Promise<JsonFileResult>
     }
   }
 }

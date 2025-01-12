@@ -6,7 +6,7 @@ const api = {
   readJson: () => ipcRenderer.invoke('read-json-file'),
   writeJson:(updatedData) => ipcRenderer.invoke('write-json',updatedData),
   readJsonByPath:(filebyPath:string) => ipcRenderer.invoke('read-json-by-path',filebyPath),
-  selectFolder:() => ipcRenderer.invoke('select-folder')
+  selectFiles:() => ipcRenderer.invoke('select-files')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
